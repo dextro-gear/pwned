@@ -1,5 +1,5 @@
-# cfos
-An online canteen food ordering system. 
+# pwned
+An online platform to check if an account has been compromised. 
 
 Contributors:-
 1. Abhishek Rajasundaram
