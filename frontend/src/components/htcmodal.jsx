@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+
 class HTCModal extends Component {
   constructor(props) {
     super(props);
@@ -6,6 +7,7 @@ class HTCModal extends Component {
     this.state = {
       passwordLength: "",
       password: "",
+      // copySuccess: false,
     };
   }
 
@@ -21,11 +23,32 @@ class HTCModal extends Component {
     // console.log(event);
     var randPwd = "";
 
-    for (var i = 0, n = charset.length; i < this.state.passwordLength; ++i) {
-      randPwd += charset.charAt(Math.floor(Math.random() * n));
+    if (this.state.passwordLength >= 12) {
+      for (var i = 0, n = charset.length; i < this.state.passwordLength; ++i) {
+        randPwd += charset.charAt(Math.floor(Math.random() * n));
+      }
+    } else {
+      randPwd = "Min. length must be 12.";
     }
 
     this.setState({ password: randPwd });
+  };
+
+  copyPassword = () => {
+    var copyText = document.getElementById("copyText").innerText;
+    console.log(copyText);
+
+    var elem = document.createElement("textarea");
+    document.body.appendChild(elem);
+    elem.value = copyText;
+    elem.select();
+    try {
+      document.execCommand("copy");
+      alert("Password copied to clipboard!");
+    } catch (e) {
+      console.log(e);
+    }
+    document.body.removeChild(elem);
   };
 
   render() {
@@ -62,11 +85,16 @@ class HTCModal extends Component {
           </form>
           <div className="password-display-container">
             <p className="password-title">Your Password</p>
-            <p className="password">
+            <p className="password" id="copyText">
               {this.state.password
                 ? this.state.password
-                : "Your password will be displayed here."}
+                : "Your password here."}
             </p>
+            {document.queryCommandSupported("copy") && (
+              <button className="copy-button" onClick={this.copyPassword}>
+                Copy to clipboard
+              </button>
+            )}
           </div>
         </div>
       </div>

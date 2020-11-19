@@ -1,11 +1,11 @@
-import Axios from "axios";
 import React, { Component } from "react";
-import "./App.css";
-import Breach from "./components/breach";
-import ETRModal from "./components/etrmodal";
-import HTCModal from "./components/htcmodal";
+import Breach from "../components/breach";
+import ETRModal from "../components/etrmodal";
+import HTCModal from "../components/htcmodal";
+import NoBreach from "../components/nobreach";
+import Axios from "axios";
 
-class App extends Component {
+class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -13,27 +13,31 @@ class App extends Component {
       HTCModal: false,
       checkType: "",
       credentials: "",
-      isBreachOpen: true,
+      isBreachOpen: false,
+      isNoBreachOpen: false,
+      breaches: [],
     };
   }
 
   checkIntegrity = () => {
     var URL =
-      "https://www.haveibeenpwned.com/api/v3/breachedaccount/" +
-      this.state.credentials;
+      "http://localhost:5000/api/v1/breachedaccount/" + this.state.credentials;
     console.log(URL);
+    this.setState({ isBreachOpen: false, isNoBreachOpen: false });
     Axios({
       method: "get",
       url: URL,
-      headers: {
-        "hibp-api-key": "742b43f7494c446f9dc816f951c3679b",
-        // "User-Agent": "pwned-aic",
-        "Content-Type": "application/json",
-        // "Origin": "http://49.207.142.29:5000",
-      },
-    }).then((response) => {
-      console.log(response);
-    });
+    })
+      .then((response) => {
+        if (response.status === 200) {
+          this.setState({ breaches: response.data, isBreachOpen: true });
+        } else {
+          this.setState({ isNoBreachOpen: true });
+        }
+      })
+      .catch((error) => {
+        this.setState({ isNoBreachOpen: true });
+      });
   };
 
   handleCredentialsChange = (event) => {
@@ -64,27 +68,6 @@ class App extends Component {
   render() {
     return (
       <div>
-        <header>
-          <nav className="navbar">
-            <ul>
-              <li>
-                <a className="nav-links" href="/Home.html">
-                  Home
-                </a>
-              </li>
-              <li>
-                <a className="nav-links" href="/About.html">
-                  About
-                </a>
-              </li>
-              <li>
-                <a className="nav-links" href="/Subscribe.html">
-                  Subscribe
-                </a>
-              </li>
-            </ul>
-          </nav>
-        </header>
         {/* <!-- The first hero section, ie., the "has my account been compromised" section --> */}
         <section>
           <center>
@@ -102,28 +85,28 @@ class App extends Component {
                 formNoValidate
                 type="email"
                 className="input"
-                placeholder="Enter your credentials associated with any account"
+                placeholder="Enter your email associated with any account"
                 onChange={this.handleCredentialsChange}
               />
               <button onClick={this.checkIntegrity} className="check-button">
                 Check for integrity
               </button>
               {/* <p class="sub-lead">
-                <input
-                  type="radio"
-                  class="radio-button"
-                  id="email"
-                  name="checkRadio"
-                  checked
-                />
-                <label class="check-label" for="email">
-                  Check email
-                </label>
-                <input type="radio" class="" id="password" name="checkRadio" />
-                <label class="check-label" for="password">
-                  Check password
-                </label>
-              </p> */}
+                  <input
+                    type="radio"
+                    class="radio-button"
+                    id="email"
+                    name="checkRadio"
+                    checked
+                  />
+                  <label class="check-label" for="email">
+                    Check email
+                  </label>
+                  <input type="radio" class="" id="password" name="checkRadio" />
+                  <label class="check-label" for="password">
+                    Check password
+                  </label>
+                </p> */}
             </div>
           </center>
         </section>
@@ -150,23 +133,27 @@ class App extends Component {
             </button>
           </div>
         </section>
-        <Breach isOpen={this.state.isBreachOpen} />
+        <NoBreach isOpen={this.state.isNoBreachOpen} />
+        <Breach
+          isOpen={this.state.isBreachOpen}
+          breaches={this.state.breaches}
+        />
         <section className="info">
           <div className="info-container">
-            <p className="numbers">1212121212</p>
-            <p className="small-text">small text</p>
+            <p className="numbers">492</p>
+            <p className="small-text">compromised websites</p>
           </div>
           <div className="info-container">
-            <p className="numbers">1212121212</p>
-            <p className="small-text">small text</p>
+            <p className="numbers">10,240,427,866</p>
+            <p className="small-text">breached accounts</p>
           </div>
           <div className="info-container">
-            <p className="numbers">1212121212</p>
-            <p className="small-text">small text</p>
+            <p className="numbers">113,831</p>
+            <p className="small-text">pastes</p>
           </div>
           <div className="info-container">
-            <p className="numbers">1212121212</p>
-            <p className="small-text">small text</p>
+            <p className="numbers">195,045,077</p>
+            <p className="small-text">paste accounts</p>
           </div>
         </section>
         <footer>
@@ -185,4 +172,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default Home;
